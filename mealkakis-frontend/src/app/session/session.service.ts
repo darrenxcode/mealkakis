@@ -1,34 +1,39 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Session } from '../common/session';
-import { RestaurantSubmission } from '../common/restaurantsubmission';
+import { Client, Stomp, StompConfig } from '@stomp/stompjs';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
-  private readonly baseUrl = 'http://localhost:8080/api/sessions';
+  private stompClient: Client;
+  constructor() {
+    this.connect();
+    this.stompClient = new Client();
 
-  private readonly headers = new HttpHeaders({
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': 'http://localhost:4200'
-  });
-
-  constructor(private http: HttpClient) { }
-
-  initiateSession(): Observable<Session>  {
-    const url = `${this.baseUrl}/initiate`;
-
-
-
-    return this.http.post<Session>(url,  { headers: this.headers });
   }
+  
+  public connect() {
+    var val = Math.floor(1000 + Math.random() * 9000);
+    var url :string = 'ws://localhost:8080/ws/123/'+val+'/websocket'
 
-  joinSession(sessionId: number) {
-    const url = `${this.baseUrl}/${sessionId}/join`;
+    const stompConfig: StompConfig = {
+      brokerURL: url, // Replace with your WebSocket server URL
+      connectHeaders: {},
+      heartbeatIncoming: 0,
+      heartbeatOutgoing: 20000,
+      reconnectDelay: 5000
 
-    return this.http.post<RestaurantSubmission[]>(url, { headers: this.headers });
-  }
+    };
+
+    this.stompClient = new Client(stompConfig);
+    console.log("WebsocketHandshake" , this.stompClient);
+
+    this.stompClient.activate();
+    
+    } 
+  
+
 
 }
+

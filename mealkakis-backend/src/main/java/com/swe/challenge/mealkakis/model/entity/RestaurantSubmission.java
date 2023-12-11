@@ -18,12 +18,19 @@ public class RestaurantSubmission {
     private Long id;
 
     private String restaurantName;
+
+    private boolean finalResult;
     // Other submission properties
 
     // Relationships
     @ManyToOne
     @JsonIgnore
     private Session session;
+
+    public RestaurantSubmission(String pickedRestaurant) {
+        this.restaurantName = pickedRestaurant;
+        this.finalResult = true;
+    }
 
     // Constructors, getters, and setters
 }

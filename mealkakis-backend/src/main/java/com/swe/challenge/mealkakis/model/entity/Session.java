@@ -16,6 +16,7 @@ public class Session {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private boolean active;
+    private String pickedRestaurant;
     // Other session properties
 
     // Relationships

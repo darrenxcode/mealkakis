@@ -21,10 +21,11 @@ public class SessionService {
         return sessionRepository.save(session);
     }
 
-    public Session endSession(Long sessionId) {
+    public Session endSession(Long sessionId,String pickedRestaurant) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid session ID"));
         session.setActive(false);
+        session.setPickedRestaurant(pickedRestaurant);
         // Perform wheel spin logic here
         return sessionRepository.save(session);
     }

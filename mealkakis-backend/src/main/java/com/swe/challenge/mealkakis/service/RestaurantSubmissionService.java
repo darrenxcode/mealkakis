@@ -7,7 +7,9 @@ import com.swe.challenge.mealkakis.repository.jpa.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RestaurantSubmissionService {
@@ -33,10 +35,17 @@ public class RestaurantSubmissionService {
     }
 
     public List<RestaurantSubmission> getSubmissionsBySession(Long sessionId) {
-        Session session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid session ID"));
-        return session.getRestaurantSubmissions();
+        Optional<Session> session = sessionRepository.findById(sessionId);
+        if (session.isPresent()) {
+           if (session.get().isActive()) {
+               return session.get().getRestaurantSubmissions();
+           }else {
+               List<RestaurantSubmission> finalResult = new ArrayList<>();
+               finalResult.add(new RestaurantSubmission(session.get().getPickedRestaurant()));
+               return finalResult;
+           }
+        }
+        return null;
     }
 
-    // Other restaurant submission management methods
 }

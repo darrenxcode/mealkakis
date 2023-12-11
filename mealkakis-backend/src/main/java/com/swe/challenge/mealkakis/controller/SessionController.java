@@ -55,6 +55,8 @@ public class SessionController {
 
         return restaurantSubmissionService.getSubmissionsBySession(sessionId);
     }
+
+
     @CrossOrigin
     @PostMapping("/{sessionId}/picked")
     public String pickRestaurant(@PathVariable Long sessionId) {
@@ -62,7 +64,9 @@ public class SessionController {
         List<RestaurantSubmission> submissions = restaurantSubmissionService.getSubmissionsBySession(sessionId);
         Random random = new Random();
         int index = random.nextInt(submissions.size());
-        return submissions.get(index).getRestaurantName();
+        String pickedRestaurant = submissions.get(index).getRestaurantName();
+        sessionService.endSession(sessionId, pickedRestaurant);
+        return pickedRestaurant;
     }
 
 }

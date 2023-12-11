@@ -1,48 +1,12 @@
-<div class="container">
-  <h1>Restaurant Session</h1>
+<h2>Create Session</h2>
 
-  <!-- Session initiation -->
-  <div *ngIf="!sessionStarted">
-    <button (click)="initiateSession()">Initiate Session</button>
-    <h2>Session ID: {{ sessionId }}</h2>
-    <button (click)="copyUrl()">Share</button>
-  </div>
+<form (ngSubmit)="initiateSession()"  >
+  <label for="sessionName">Session Name:</label>
+  <input type="text" id="sessionName" [(ngModel)]="sessionName" required>
 
-  <!-- Join session -->
-  <div *ngIf="sessionStarted && !sessionEnded">
-    <h2>Session ID: {{ sessionId }}</h2>
-    <p>Share this ID with others to join the session.</p>
-    <button (click)="joinSession()">Join Session</button>
-  <!-- Share button -->
-    <button (click)="copyUrl()">Share</button>
-  </div>
+  <label for="sessionName">Session Name:</label>
+  <input type="text" id="sessionName" [(ngModel)]="sessionName" required>
 
-  <!-- Submit restaurant -->
-  <div *ngIf="sessionJoin && !sessionEnded">
-    <h2>Submit Restaurant</h2>
-    <input type="text" [(ngModel)]="restaurantName" placeholder="Restaurant name" />
-    <button (click)="submitRestaurant()">Submit</button>
-    <button (click)="getRestaurants()">Update Restaurant</button>
-  </div>
+  <button type="submit">Create Session</button>
+</form>
 
-
-  <!-- Display submitted restaurants -->
-  <div *ngIf="sessionSubmitted || sessionUpdated ">
-    <h2>Submitted Restaurants</h2>
-    <ul>
-      <li *ngFor="let restaurantSubmission of restaurantSubmissions">
-        {{ restaurantSubmission.restaurantName }} </li>
-    </ul>
-  </div>
-
-  <!-- End session and spin wheel -->
-  <div *ngIf="sessionStarted && !sessionEnded">
-    <button (click)="endSession()">End Session</button>
-  </div>
-
-  <!-- Picked restaurant -->
-  <div *ngIf="sessionEnded">
-    <h2>Picked Restaurant</h2>
-    <p>{{ pickedRestaurant | json }}</p>
-  </div>
-</div>
