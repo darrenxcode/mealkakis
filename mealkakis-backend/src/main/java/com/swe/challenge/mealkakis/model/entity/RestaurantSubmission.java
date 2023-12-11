@@ -23,7 +23,6 @@ public class RestaurantSubmission {
     // Relationships
     @ManyToOne
     @JsonIgnore
-
     private Session session;
 
     // Constructors, getters, and setters

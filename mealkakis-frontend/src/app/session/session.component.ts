@@ -1,73 +1,89 @@
-import { Component,OnInit  } from '@angular/core';
-import { SessionService } from '../session/session.service';
-import { Client } from '@stomp/stompjs';
+import { Component, OnInit } from '@angular/core';
+import { SessionService } from './session.service';
+import { RestaurantService } from './restaurant.service';
+import { Session } from '../common/session';
+import { RestaurantSubmission } from '../common/restaurantsubmission';
+import { Router } from '@angular/router';
+
 
 
 @Component({
   selector: 'app-session',
   templateUrl: './session.component.html',
-  styleUrl: './session.component.css'
+  styleUrls: ['./session.component.css']
 })
-export class SessionComponent {
-  sessionDetails: any = {
-    // Session information (e.g., name, creator, status, etc.)
-  };
-  sessionName: string = '';
-  hostName: string = '';
-  showShareLink: boolean;
-  stompClient : Client;
+export class SessionComponent  {
+  sessionStarted = false;
+  sessionEnded = false;
+  sessionJoin = false;
+  sessionSubmitted = false;
+  sessionUpdated = false;
+  sessionId: number = 0;
+  restaurantName: string ='';
+  isRoutedUrl: boolean = false;
 
-  joinedUsers: string[] = [];
-  submittedRestaurants: string[] = [];
-  pickedRestaurant: string = '';
+  session: Session | undefined;
+  restaurantSubmissions: RestaurantSubmission []= [] // Update the type to RestaurantSubmission[] | undefined
 
-  constructor(private sessionService: SessionService) {
-    this.showShareLink = false;
-    this.stompClient = new Client();
+  
+  pickedRestaurant: string ='';
+  
+  stringList: string[] = [];
+  constructor(private sessionService: SessionService, private restaurantService: RestaurantService,) {
+   }
 
-  }
-  ngOnInit() {
-    this.sessionService.connect();
-  }
+initiateSession() {
+  this.sessionService.initiateSession().subscribe(session => {
+    this.sessionStarted = true;
 
+    this.session = session; // Store the returned session object
+    this.sessionId = session.id; // Set the sessionId property
+  });
+}
 
-
-  initiateSession() {
-
-    const message = {
-      hostName: this.hostName,
-      sessionName: this.sessionName,
-    };
-
-      this.stompClient.publish({
-       destination: '/session.create',
-        body: JSON.stringify(message),
-      });
-     
-  }
-
-  joinSession() {
-
-    const message = {
-      hostName: this.hostName,
-      sessionName: this.sessionName,
-    };
-
-      this.stompClient.publish({
-       destination: '/session.join',
-        body: JSON.stringify(message),
-      });
-  }
-
-  submitRestaurant(restaurant: string) {
-    // Logic to submit a restaurant
-    // Call the sessionService to submit the restaurant
-  }
-
-  endSession() {
-    // Logic to end the session
-    // Call the sessionService to end the session
-  }
+copyUrl() {
+  const url = window.location.href;
+  const urlWithSessionId = `${url}app-joinpage`;
+  navigator.clipboard.writeText(urlWithSessionId).then(() => {
+    console.log('URL copied to clipboard:', urlWithSessionId);
+  }, (error) => {
+    console.error('Failed to copy URL:', error);
+  });
+}
 
 
+
+joinSession() {
+  this.sessionService.joinSession(this.sessionId).subscribe(restaurantSubmissions => {
+
+    this.restaurantSubmissions = restaurantSubmissions;
+    this.sessionJoin = true;
+
+  });
+}
+
+
+submitRestaurant() {
+
+  this.restaurantService.submitRestaurant(this.sessionId,this.restaurantName).subscribe(restaurantSubmissions => {
+    this.restaurantSubmissions = restaurantSubmissions;
+    
+    this.sessionSubmitted = true;
+  });
+}
+
+getRestaurants() {
+  this.restaurantService.getRestaurants(this.sessionId).subscribe(restaurantSubmissions => {
+    this.restaurantSubmissions = restaurantSubmissions;
+  });
+}
+
+endSession() {
+  this.restaurantService.pickRestaurant(this.sessionId).subscribe(pickedRestaurant => {
+    this.pickedRestaurant = pickedRestaurant;
+    this.sessionEnded = true;
+    console.log(this.pickedRestaurant);
+    
+  });
+}
 }
